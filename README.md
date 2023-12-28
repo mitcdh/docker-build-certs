@@ -31,8 +31,8 @@ Replace `/path/to/certs` with the path where you want to store the certificates 
 The script within the container supports several environment variables to customize the generated certificates:
 
 - `CA_CN`: Common Name for the Certificate Authority. Default is "CertificateCA".
-- `CERTIFICATE_CN`: Common Name for the learner's certificate. Default is "certificate".
-- `CERTIFICATE_SAN`: Subject Alternative Names for the learner's certificate. Should be a comma-separated list. Default is "certificate".
+- `CERTIFICATE_CN`: Common Name for the certificate. Default is "certificate".
+- `CERTIFICATE_SAN`: Subject Alternative Names for the certificate. Should be a comma-separated list. Default is "certificate".
 - `DAYS_VALID`: Number of days the certificate is valid. Default is 365.
 
 You can set these environment variables using the `-e` flag in the `docker run` command. For example:
