@@ -2,7 +2,7 @@ FROM alpine:latest
 
 # Install OpenSSL
 RUN apk update && \
-  apk add --no-cache openssl && \
+  apk add --no-cache openssl openjdk11-jre-headless && \
   rm -rf "/var/cache/apk/*"
 
 # Copy the entrypoint script

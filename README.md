@@ -14,15 +14,17 @@ To use this container, you need to build the Docker image and then run the conta
 
 First, build the image using the provided Dockerfile:
 
-````
+```bash
 docker build -t build-certs .
-````
+```
 
 ### Running the Container
 
 To run the container, use the following command:
 
+```bash
 docker run -v /path/to/certs:/certs build-certs
+```
 
 Replace `/path/to/certs` with the path where you want to store the certificates and keys on your host machine.
 
@@ -34,22 +36,23 @@ The script within the container supports several environment variables to custom
 - `CERTIFICATE_CN`: Common Name for the certificate. Default is "certificate".
 - `CERTIFICATE_SAN`: Subject Alternative Names for the certificate. Should be a comma-separated list. Default is "certificate".
 - `DAYS_VALID`: Number of days the certificate is valid. Default is 365.
+- `KEYSTORE_PASSWORD`: Password for the Java Keystore. Default is "password".
 
 You can set these environment variables using the `-e` flag in the `docker run` command. For example:
 
-````
-docker run -v /path/to/certs:/certs -e CA_CN="MyCustomCACN" -e CERTIFICATE_CN="mydomain.com" build-certs
-````
+```bash
+docker run -v /path/to/certs:/certs -e CA_CN="MyCustomCACN" -e CERTIFICATE_CN="mydomain.com" -e CERTIFICATE_SAN="mydomain.com,www.mydomain.com" build-certs
+```
 
 ## Volume
 
-The `/certs` volume is used to store the generated certificate (`certificate.crt`) and key (`certificate.key`). If these files already exist in the volume (for example if it is bind mounted), the script will not generate new ones. This allows the container to run as a build in workflows that support testing and production deployments.
+The `/certs` volume is used to store the generated certificate (`certificate.crt`), key (`certificate.key`), and CA certificate (`ca.crt`). If these files already exist in the volume (for example if it is bind mounted), the script will not generate new ones. This allows the container to run as a build in workflows that support testing and production deployments.
 
 ## Using in Docker Compose
 
 You can also use the container within a Docker Compose setup. Below is an example `docker-compose.yml` file that demonstrates how to use the generator in conjunction with another service that depends on it.
 
-````
+```yaml
 version: '3.8'
 
 services:
@@ -64,7 +67,7 @@ services:
       - ./certs:/etc/nginx/certs:ro
     depends_on:
       - build-certs
-````
+```
 
 In this `docker-compose.yml`:
 
@@ -73,3 +76,14 @@ In this `docker-compose.yml`:
 - The `depends_on` directive ensures that the `webserver` service starts only after the `build-certs` service has completed its execution.
 
 Ensure that the certificates directory (`./certs`) exists on your host machine or is created by the SSL Certificate Generator service.
+
+## Generated Files
+
+The script generates the following files in the `/certs` volume:
+
+- `ca.crt`: The self-signed CA certificate.
+- `ca.key`: The private key for the CA certificate.
+- `certificate.crt`: The signed certificate.
+- `certificate.key`: The private key for the signed certificate.
+- `certificate.csr`: The Certificate Signing Request (CSR) used to generate the signed certificate.
+- `keystore.jks`: The certificate, key, and CA certificate bundled into a Java Keystore.
